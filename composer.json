@@ -1,0 +1,19 @@
+{
+    "name": "obijuan/bulk-edit-question-category-for-learndash",
+    "description": "Edit LearnDash questions category in bulk",
+    "type": "wp-plugin",
+    "license": "GPL v2 or above",
+    "autoload": {
+        "psr-4": {
+            "Bulk_Edit_Questions_Category_For_LearnDash\\": "includes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Obi Juan",
+            "email": "support@obijuan.dev"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
