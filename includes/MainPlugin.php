@@ -69,6 +69,16 @@ class MainPlugin
                         </select>
                 </div>
             </fieldset>
+
+            <fieldset class="inline-edit-col-right" style="margin: .2em 0;">
+                <div class="inline-edit-group" style="display: flex; align-items: center; gap: 10px;">
+                    <label id="bulk-edit-question-points-label" class="max-width:100%!important">
+                        <span class="title" style="margin-right: 0px; line-height: 1.2;">Question Points</span>
+                        <input type="number" name="custom_points" id="custom_points" style="flex: 1;" value="0" />
+                    </label>
+                </div>
+            </fieldset>
+            
 <?php
         }
     }
@@ -95,9 +105,12 @@ class MainPlugin
                 }
             }
 
-            // Redirect with success message
-            $redirect_url = add_query_arg('category_updated', count($post_ids), wp_get_referer());
-            wp_safe_redirect($redirect_url);
+            // Store the count in a transient with a unique key based on user ID
+            $user_id = get_current_user_id();
+            $transient_key = 'bulk_edit_category_updated_' . $user_id;
+            set_transient($transient_key, count($post_ids), 45); // Expires after 45 seconds
+            
+            wp_safe_redirect(wp_get_referer());
             exit;
         }
     }
@@ -105,8 +118,14 @@ class MainPlugin
     // Display admin notice
     public static function show_category_update_notice()
     {
-        if (! empty($_GET['category_updated'])) {
-            $count = intval($_GET['category_updated']);
+        $user_id = get_current_user_id();
+        $transient_key = 'bulk_edit_category_updated_' . $user_id;
+        $count = get_transient($transient_key);
+        
+        if ($count !== false) {
+            // Delete the transient immediately to prevent it from showing again
+            delete_transient($transient_key);
+            
             printf(
                 '<div class="updated"><p>%s</p></div>',
                 sprintf(
